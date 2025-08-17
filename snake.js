@@ -22,14 +22,61 @@ function initGame() {
   clearInterval(gameInterval);
   gameInterval = setInterval(draw, 150);
 }
+function drawGrid() {
+  ctx.strokeStyle = '#333';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i <= tileCount; i++) {
+    ctx.beginPath();
+    ctx.moveTo(i * gridSize, 0);
+    ctx.lineTo(i * gridSize, canvas.height);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(0, i * gridSize);
+    ctx.lineTo(canvas.width, i * gridSize);
+    ctx.stroke();
+  }
+}
+
+function drawFood() {
+  const x = food.x * gridSize + gridSize / 2;
+  const y = food.y * gridSize + gridSize / 2;
+
+  ctx.fillStyle = '#f00';
+  ctx.beginPath();
+  ctx.arc(x, y, gridSize / 2, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#0a0';
+  ctx.beginPath();
+  ctx.moveTo(x, y - gridSize / 2);
+  ctx.lineTo(x + gridSize * 0.2, y - gridSize * 0.7);
+  ctx.lineTo(x - gridSize * 0.2, y - gridSize * 0.7);
+  ctx.fill();
+}
+
+function drawSnake() {
+  snake.forEach((segment, index) => {
+    const x = segment.x * gridSize;
+    const y = segment.y * gridSize;
+
+    ctx.fillStyle = index === 0 ? '#0a0' : '#0f0';
+    ctx.fillRect(x, y, gridSize, gridSize);
+
+    if (index === 0) {
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(x + gridSize * 0.2, y + gridSize * 0.2, gridSize * 0.2, gridSize * 0.2);
+      ctx.fillRect(x + gridSize * 0.6, y + gridSize * 0.2, gridSize * 0.2, gridSize * 0.2);
+    }
+  });
+}
+
 
 function draw() {
   ctx.fillStyle = '#222';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Draw food
-  ctx.fillStyle = '#f00';
-  ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
+  drawGrid();
+  drawFood();
 
   // Move snake
   const head = {
@@ -50,11 +97,7 @@ function draw() {
     snake.pop();
   }
 
-  // Draw snake
-  ctx.fillStyle = '#0f0';
-  for (let segment of snake) {
-    ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
-  }
+  drawSnake();
 
   // Check self-collision
   if (snake.slice(1).some(s => s.x === head.x && s.y === head.y)) {
