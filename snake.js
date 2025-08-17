@@ -2,6 +2,8 @@ const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const scoreDisplay = document.getElementById('score');
 const gameOverDisplay = document.getElementById('game-over');
+const scoreboard = document.getElementById('scoreboard');
+const highScoresList = document.getElementById('high-scores');
 
 const gridSize = 20;
 const tileCount = canvas.width / gridSize;
@@ -15,6 +17,7 @@ function initGame() {
   score = 0;
   scoreDisplay.textContent = 'Score: 0';
   gameOverDisplay.style.display = 'none';
+  scoreboard.style.display = 'none';
 
   clearInterval(gameInterval);
   gameInterval = setInterval(draw, 150);
@@ -68,6 +71,20 @@ function endGame(message) {
   clearInterval(gameInterval);
   gameOverDisplay.style.display = 'block';
   gameOverDisplay.firstChild.textContent = message;
+
+  let scores = JSON.parse(localStorage.getItem('scores') || '[]');
+  scores.push(score);
+  scores.sort((a, b) => b - a);
+  scores = scores.slice(0, 5);
+  localStorage.setItem('scores', JSON.stringify(scores));
+
+  highScoresList.innerHTML = '';
+  scores.forEach((s) => {
+    const li = document.createElement('li');
+    li.textContent = s;
+    highScoresList.appendChild(li);
+  });
+  scoreboard.style.display = 'block';
 }
 
 function restartGame() {
